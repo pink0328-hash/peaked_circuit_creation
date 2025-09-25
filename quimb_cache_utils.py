@@ -1,11 +1,11 @@
 import gc
 import sys
 
-import bittensor as bt
+# import bittensor as bt
 
 
 def clear_all_quimb_caches():
-    bt.logging.info("Starting quimb cache sweep...")
+    print("INFO: Starting quimb cache sweep...")
     cleared_count = 0
     quimb_modules = 0
 
@@ -34,4 +34,4 @@ def clear_all_quimb_caches():
             continue
 
     gc.collect()
-    bt.logging.info(f"Quimb cache sweep complete: {quimb_modules} modules checked, {cleared_count} caches cleared")
+    print(f"INFO: Quimb cache sweep complete: {quimb_modules} modules checked, {cleared_count} caches cleared")

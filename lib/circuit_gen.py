@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import time
 import os
 
-import bittensor as bt
+# import bittensor as bt
 import cotengra as ctg
 import numpy as np
 import quimb.tensor as qtn
@@ -16,7 +16,7 @@ from base_cache import (load_base_su4, save_base_su4,
 )
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-bt.logging.info(f"Using device: {DEVICE} (CUDA available: {torch.cuda.is_available()})")
+print(f"INFO: f"Using device: {DEVICE} (CUDA available: {torch.cuda.is_available(")})")
 
 opti = ctg.ReusableHyperOptimizer(
     progbar=False,
@@ -205,7 +205,7 @@ def find_lucky_seed_and_make_circuit(
     NUM_SEEDS_TO_TRY = 20
     seed_losses = {}
 
-    bt.logging.info(f"Pre-screening {NUM_SEEDS_TO_TRY} seeds by initial loss...")
+    print(f"INFO: f"Pre-screening {NUM_SEEDS_TO_TRY} seeds by initial loss..."")
 
     with torch.no_grad():
         for i in range(NUM_SEEDS_TO_TRY):
@@ -219,7 +219,7 @@ def find_lucky_seed_and_make_circuit(
             seed_losses[candidate_seed] = initial_loss.item()
 
     best_seed = min(seed_losses, key=seed_losses.get)
-    bt.logging.info(f" Selected champion seed: {best_seed} (Loss: {seed_losses[best_seed]:.4e})")
+    print(f"INFO: f" Selected champion seed: {best_seed} (Loss: {seed_losses[best_seed]:.4e}")")
 
     # 1 forward-pass sanity check on the champion seed to catch bad
     # contraction cases (e.g., torch >25 dims) before full optim
@@ -230,7 +230,7 @@ def find_lucky_seed_and_make_circuit(
             )
             _ = _m_check()
         except RuntimeError as e:
-            bt.logging.warning(f"Champion seed {best_seed} failed prescreen forward: {e}")
+            print(f"WARNING: f"Champion seed {best_seed} failed prescreen forward: {e}"")
             raise
 
     
@@ -254,14 +254,14 @@ def find_lucky_seed_and_make_circuit(
         optimizer.step()
         
         if step % 100 == 0:
-            bt.logging.debug(f"Step {step}/{maxiters}, Loss: {loss.item():.6e}")
+            print(f"DEBUG: f"Step {step}/{maxiters}, Loss: {loss.item("):.6e}")
 
         if -loss.item() * 2**nqubits > target_peaking:
-            bt.logging.info(f"Early stop at step {step}: peak > {target_peaking:g}x uniform")
+            print(f"INFO: f"Early stop at step {step}: peak > {target_peaking:g}x uniform"")
             break
             
     opt_loop_time = time.perf_counter() - start_opt_loop
-    bt.logging.info(f"Optimization loop finished in {opt_loop_time:.4f} seconds.")
+    print(f"INFO: f"Optimization loop finished in {opt_loop_time:.4f} seconds."")
 
     with torch.no_grad():
         final_params = {int(i): p.data for i, p in model.torch_params.items()}
@@ -274,7 +274,7 @@ def find_lucky_seed_and_make_circuit(
     pqc_tensors = list(opt_final_norm.tensors[::-1])
     
     opti.cleanup()
-    bt.logging.debug("Cleared cotengra optimizer cache")
+    print(f"DEBUG: "Cleared cotengra optimizer cache"")
     
     return rqc_tensors, pqc_tensors, target_weight
 
@@ -325,7 +325,7 @@ class CircuitParams:
             target_peaking=peaking_threshold,
         )
         make_circuit_time = time.perf_counter() - start_time
-        bt.logging.info(f"Total time for make_circuit: {make_circuit_time:.4f} seconds")
+        print(f"INFO: f"Total time for make_circuit: {make_circuit_time:.4f} seconds"")
 
         start_conversion = time.perf_counter()
         r_rev = os.getenv("QBT_NORM_RQC_REVERSE", "0").strip() == "1"
@@ -340,7 +340,7 @@ class CircuitParams:
             reverse_pqc=p_rev,
         )
         conversion_time = time.perf_counter() - start_conversion
-        bt.logging.info(f"Time for final conversion to SU4 (GPU->CPU): {conversion_time:.4f} seconds")
+        print(f"INFO: f"Time for final conversion to SU4 (GPU->CPU"): {conversion_time:.4f} seconds")
 
         try:
             save_base_su4(
@@ -401,7 +401,7 @@ class CircuitParams:
             target_peaking=peaking_threshold,
         )
         make_circuit_time = time.perf_counter() - start_time
-        bt.logging.info(f"Total time for make_circuit (shared): {make_circuit_time:.4f} seconds")
+        print(f"INFO: f"Total time for make_circuit (shared"): {make_circuit_time:.4f} seconds")
 
         start_conversion = time.perf_counter()
 
@@ -417,7 +417,7 @@ class CircuitParams:
             reverse_pqc=p_rev,
         )
         conversion_time = time.perf_counter() - start_conversion
-        bt.logging.info(f"Time for final conversion to SU4 (GPU->CPU): {conversion_time:.4f} seconds")
+        print(f"INFO: f"Time for final conversion to SU4 (GPU->CPU"): {conversion_time:.4f} seconds")
 
         def _pool_initializer():
             import os as _os

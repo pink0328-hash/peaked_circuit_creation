@@ -31,10 +31,10 @@ def create_demo_circuit(n_qubits: int = 40, difficulty: float = 1.0, seed: int =
     circuit = circuit_params.compute_circuit(seed)
     circuit_time = time.time() - start_time
     
-    print(f"   ✅ Circuit generated in {circuit_time:.2f}s")
-    print(f"   📊 Target state: {circuit.target_state}")
-    print(f"   📈 Peak probability: {circuit.peak_prob:.2e}")
-    print(f"   🔢 Number of gates: {len(circuit.gates)}")
+    print(f"Circuit generated in {circuit_time:.2f}s")
+    print(f"Target state: {circuit.target_state}")
+    print(f"Peak probability: {circuit.peak_prob:.2e}")
+    print(f"Number of gates: {len(circuit.gates)}")
     
     return circuit_params, circuit
 
@@ -42,7 +42,7 @@ def create_tensor_network_from_circuit(circuit, n_qubits: int) -> Any:
     """Convert the circuit to a tensor network for optimization."""
     import quimb.tensor as qtn
     
-    print(f"🔄 Converting circuit to tensor network...")
+    print(f"Converting circuit to tensor network...")
     
     # Create initial state |0...0⟩
     circuit_tn = qtn.MPS_computational_state("0" * n_qubits).astype_("complex64")
@@ -72,11 +72,11 @@ def create_tensor_network_from_circuit(circuit, n_qubits: int) -> Any:
                                        (subgate.target,), tags=[f"gate_{gate_count}"])
                         gate_count += 1
         except Exception as e:
-            print(f"   ⚠️  Skipping gate {gate_count}: {e}")
+            print(f"Skipping gate {gate_count}: {e}")
             continue
     
-    print(f"   ✅ Applied {gate_count} gates to tensor network")
-    print(f"   📊 Tensor network has {len(circuit_tn.tensors)} tensors")
+    print(f"Applied {gate_count} gates to tensor network")
+    print(f"Tensor network has {len(circuit_tn.tensors)} tensors")
     
     return circuit_tn
 
@@ -87,8 +87,8 @@ def demo_map_optimization(circuit_tn, target_state: str, n_qubits: int) -> Dict[
     
     # Calculate search space size
     search_space = 2 ** n_qubits
-    print(f"📊 Search space: 2^{n_qubits} = {search_space:,} bitstrings")
-    print(f"📊 Original method would take ~{search_space / 2000 / 3600:.1f} hours at 2000 it/s")
+    print(f"Search space: 2^{n_qubits} = {search_space:,} bitstrings")
+    print(f"Original method would take ~{search_space / 2000 / 3600:.1f} hours at 2000 it/s")
     
     # Initialize MAP optimizer
     optimizer = MAPOptimizer(
@@ -99,7 +99,7 @@ def demo_map_optimization(circuit_tn, target_state: str, n_qubits: int) -> Dict[
         beam_width=64
     )
     
-    print(f"🚀 Starting MAP optimization...")
+    print(f"Starting MAP optimization...")
     start_time = time.time()
     
     try:
@@ -111,20 +111,20 @@ def demo_map_optimization(circuit_tn, target_state: str, n_qubits: int) -> Dict[
         execution_time = time.time() - start_time
         probability = np.exp(log_prob)
         
-        print(f"✅ MAP Optimization Complete!")
-        print(f"   🎯 Found bitstring: {bitstring}")
-        print(f"   📈 Probability: {probability:.2e}")
-        print(f"   📊 Log probability: {log_prob:.2f}")
-        print(f"   ⏱️  Execution time: {execution_time:.2f}s")
-        print(f"   🔄 Iterations: {stats.get('iterations', 'N/A')}")
-        print(f"   ✂️  Pruned: {stats.get('pruned_count', 'N/A')}")
-        print(f"   📊 Queue size: {stats.get('queue_size', 'N/A')}")
+        print(f"MAP Optimization Complete!")
+        print(f"Found bitstring: {bitstring}")
+        print(f"Probability: {probability:.2e}")
+        print(f"Log probability: {log_prob:.2f}")
+        print(f"Execution time: {execution_time:.2f}s")
+        print(f"Iterations: {stats.get('iterations', 'N/A')}")
+        print(f"Pruned: {stats.get('pruned_count', 'N/A')}")
+        print(f"Queue size: {stats.get('queue_size', 'N/A')}")
         
         # Calculate speedup
         original_time_hours = search_space / 2000 / 3600
         speedup = original_time_hours * 3600 / execution_time if execution_time > 0 else float('inf')
-        print(f"   🚀 Speedup: {speedup:.1f}x faster than original method")
-        print(f"   ⏰ Time saved: {original_time_hours - execution_time/3600:.1f} hours")
+        print(f"Speedup: {speedup:.1f}x faster than original method")
+        print(f"Time saved: {original_time_hours - execution_time/3600:.1f} hours")
         
         optimizer.cleanup()
         
@@ -175,11 +175,11 @@ def demo_boundary_mps(circuit_tn, target_state: str, n_qubits: int) -> Dict[str,
         bitstring, probability, stats = optimizer.find_peaked_bitstring(beam_width=64)
         execution_time = time.time() - start_time
         
-        print(f"✅ Boundary-MPS Complete!")
-        print(f"   🎯 Found bitstring: {bitstring}")
-        print(f"   📈 Probability: {probability:.2e}")
-        print(f"   ⏱️  Execution time: {execution_time:.2f}s")
-        print(f"   📊 Stats: {stats}")
+        print(f"Boundary-MPS Complete!")
+        print(f"Found bitstring: {bitstring}")
+        print(f"Probability: {probability:.2e}")
+        print(f"Execution time: {execution_time:.2f}s")
+        print(f"Stats: {stats}")
         
         optimizer.cleanup()
         
@@ -195,7 +195,7 @@ def demo_boundary_mps(circuit_tn, target_state: str, n_qubits: int) -> Dict[str,
         
     except Exception as e:
         execution_time = time.time() - start_time
-        print(f"❌ Boundary-MPS Failed: {e}")
+        print(f"Boundary-MPS Failed: {e}")
         optimizer.cleanup()
         
         return {
@@ -211,7 +211,7 @@ def demo_boundary_mps(circuit_tn, target_state: str, n_qubits: int) -> Dict[str,
 
 def demo_optimized_contraction(circuit_tn, target_state: str, n_qubits: int) -> Dict[str, Any]:
     """Demonstrate optimized contraction."""
-    print(f"\n🔍 Optimized Contraction Demo ({n_qubits} qubits)")
+    print(f"\nOptimized Contraction Demo ({n_qubits} qubits)")
     print("=" * 60)
     
     # Initialize optimized contraction
@@ -222,7 +222,7 @@ def demo_optimized_contraction(circuit_tn, target_state: str, n_qubits: int) -> 
         use_mixed_precision=True
     )
     
-    print(f"🚀 Starting optimized contraction...")
+    print(f"Starting optimized contraction...")
     start_time = time.time()
     
     try:
@@ -234,11 +234,11 @@ def demo_optimized_contraction(circuit_tn, target_state: str, n_qubits: int) -> 
         )
         execution_time = time.time() - start_time
         
-        print(f"✅ Optimized Contraction Complete!")
-        print(f"   🎯 Found bitstring: {bitstring}")
-        print(f"   📈 Probability: {probability:.2e}")
-        print(f"   ⏱️  Execution time: {execution_time:.2f}s")
-        print(f"   📊 Stats: {stats}")
+        print(f"Optimized Contraction Complete!")
+        print(f"Found bitstring: {bitstring}")
+        print(f"Probability: {probability:.2e}")
+        print(f"Execution time: {execution_time:.2f}s")
+        print(f"Stats: {stats}")
         
         optimizer.cleanup()
         
@@ -254,7 +254,7 @@ def demo_optimized_contraction(circuit_tn, target_state: str, n_qubits: int) -> 
         
     except Exception as e:
         execution_time = time.time() - start_time
-        print(f"❌ Optimized Contraction Failed: {e}")
+        print(f"Optimized Contraction Failed: {e}")
         optimizer.cleanup()
         
         return {
@@ -270,12 +270,12 @@ def demo_optimized_contraction(circuit_tn, target_state: str, n_qubits: int) -> 
 
 def run_demo(n_qubits: int = 40, difficulty: float = 1.0, seed: int = 42, methods: list = None):
     """Run the complete demo."""
-    print("🚀 40-Qubit Peak Circuit Optimization Demo")
+    print("40-Qubit Peak Circuit Optimization Demo")
     print("=" * 80)
-    print(f"🎯 Target: {n_qubits} qubits")
-    print(f"🔧 Device: {DEVICE}")
-    print(f"📊 Difficulty: {difficulty}")
-    print(f"🎲 Seed: {seed}")
+    print(f"Target: {n_qubits} qubits")
+    print(f"Device: {DEVICE}")
+    print(f"Difficulty: {difficulty}")
+    print(f"Seed: {seed}")
     print("=" * 80)
     
     if methods is None:
@@ -300,7 +300,7 @@ def run_demo(n_qubits: int = 40, difficulty: float = 1.0, seed: int = 42, method
         results["optimized"] = demo_optimized_contraction(circuit_tn, circuit.target_state, n_qubits)
     
     # Print summary
-    print(f"\n📊 DEMO SUMMARY")
+    print(f"\nDEMO SUMMARY")
     print("=" * 80)
     print(f"{'Method':<20} | {'Time (s)':<10} | {'Probability':<12} | {'Success':<8}")
     print("-" * 80)
@@ -314,7 +314,7 @@ def run_demo(n_qubits: int = 40, difficulty: float = 1.0, seed: int = 42, method
     # Calculate theoretical original time
     search_space = 2 ** n_qubits
     original_time_hours = search_space / 2000 / 3600
-    print(f"\n📈 PERFORMANCE COMPARISON")
+    print(f"\nPERFORMANCE COMPARISON")
     print("-" * 80)
     print(f"Original method (theoretical): {original_time_hours:.1f} hours")
     print(f"Search space: 2^{n_qubits} = {search_space:,} bitstrings")
